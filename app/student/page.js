@@ -36,7 +36,7 @@ export default function StudentDashboard() {
     );
   }
 
-  const topics = topicsData?.topics || [];
+  const topics = [...(topicsData?.topics || [])].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
   const progress = progressData?.progress || [];
   const quizzes = quizzesData?.quizzes || [];
   const attempts = attemptsData?.attempts || [];
@@ -44,10 +44,10 @@ export default function StudentDashboard() {
   // Calculate Stats
   const totalLessonsCompleted = progress.reduce((sum, p) => sum + p.completedLessons, 0);
   const totalQuizzesTaken = attempts.length;
-  const avgScore = attempts.length > 0 
+  const avgScore = attempts.length > 0
     ? Math.round(attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length) // Use percentage if score is out of 100
-    : 0; 
-    // Assuming score is % based on existing code, or checking 'percentage' field
+    : 0;
+  // Assuming score is % based on existing code, or checking 'percentage' field
 
   // Helper to find progress for a topic
   const getTopicProgress = (topicId) => progress.find(p => p.topicId?._id === topicId || p.topicId === topicId);
@@ -75,12 +75,12 @@ export default function StudentDashboard() {
       </section>
 
       {/* Stats Row */}
-      <section 
-        style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", 
-          gap: 24, 
-          marginBottom: 40 
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 24,
+          marginBottom: 40
         }}
       >
         <div className="card" style={{ borderLeft: "4px solid #3498db", padding: "24px" }}>
@@ -104,9 +104,9 @@ export default function StudentDashboard() {
           {topics.map((topic) => {
             const topicProgress = getTopicProgress(topic._id);
             const topicQuizzes = getTopicQuizzes(topic._id);
-            
+
             return (
-              <StudentTopicCard 
+              <StudentTopicCard
                 key={topic._id}
                 topic={topic}
                 topicProgress={topicProgress}
@@ -139,8 +139,8 @@ export default function StudentDashboard() {
                     <td style={{ padding: 16, color: "#64748b" }}>{new Date(attempt.createdAt).toLocaleDateString()}</td>
                     <td style={{ padding: 16, fontWeight: 700 }}>{attempt.percentage}%</td>
                     <td style={{ padding: 16 }}>
-                      <span className="badge" style={{ 
-                        background: attempt.percentage >= 70 ? "#dcfce7" : "#fee2e2", 
+                      <span className="badge" style={{
+                        background: attempt.percentage >= 70 ? "#dcfce7" : "#fee2e2",
                         color: attempt.percentage >= 70 ? "#166534" : "#991b1b",
                         fontSize: 11
                       }}>
@@ -150,7 +150,7 @@ export default function StudentDashboard() {
                   </tr>
                 ))}
                 {!attempts.length && (
-                   <tr><td colSpan="4" style={{ padding: 24, textAlign: "center", color: "#64748b" }}>No recent activity found.</td></tr>
+                  <tr><td colSpan="4" style={{ padding: 24, textAlign: "center", color: "#64748b" }}>No recent activity found.</td></tr>
                 )}
               </tbody>
             </table>

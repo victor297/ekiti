@@ -70,12 +70,12 @@ export default function HomePage() {
             maxWidth: 700,
             margin: "0 auto 40px"
           }}>
-            Engaging video lessons, interactive quizzes, and real-time progress tracking. 
+            Engaging video lessons, interactive quizzes, and real-time progress tracking.
             Built for JSS 2 students to excel in Statistics, Algebra, and more.
           </p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link 
-              href="/signup" 
+            <Link
+              href="/signup"
               className="button primary"
               style={{
                 background: "white",
@@ -87,8 +87,8 @@ export default function HomePage() {
             >
               Start Learning Free
             </Link>
-            <a 
-              href="#topics" 
+            <a
+              href="#topics"
               className="button secondary"
               style={{
                 background: "rgba(255,255,255,0.2)",
@@ -211,7 +211,7 @@ export default function HomePage() {
               gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
               gap: 24
             }}>
-              {data?.topics?.map((topic, index) => (
+              {[...(data?.topics || [])].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })).map((topic, index) => (
                 <div
                   key={topic._id}
                   className="card"

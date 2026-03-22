@@ -1,7 +1,7 @@
 export const seedQuizzes = [
   {
     title: "Statistics Check-in",
-    topicName: "Statistics",
+    topicName: "Week 1: STATISTICS 1 (Data Presentation)",
     description: "Quick check on averages and charts.",
     questions: [
       {

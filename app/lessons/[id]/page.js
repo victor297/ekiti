@@ -7,7 +7,12 @@ import { useGetTopicsQuery, useUpdateProgressMutation, useGetProgressQuery } fro
 import Loader from "@/components/Loader";
 import AITutor from "@/components/AITutor";
 import toast from "react-hot-toast";
-
+import Week1Interactions from "@/components/Week1Interactions";
+import Week2Interactions from "@/components/Week2Interactions";
+import Week3Interactions from "@/components/Week3Interactions";
+import Week4Interactions from "@/components/Week4Interactions";
+import Week5Interactions from "@/components/Week5Interactions";
+import Week6Interactions from "@/components/Week6Interactions";
 export default function LessonPage() {
   const { id } = useParams(); // This is topicId-lessonIndex format
   const router = useRouter();
@@ -61,7 +66,8 @@ export default function LessonPage() {
 
   const nextLessonIndex = lessonIndex + 1;
   const hasNextLesson = nextLessonIndex < topic.lessons.length;
-  const isLastLesson = !hasNextLesson;
+  const prevLessonIndex = lessonIndex - 1;
+  const hasPrevLesson = lessonIndex > 0;
 
   const handleMarkComplete = async () => {
     if (!session?.user?.email) {
@@ -71,10 +77,10 @@ export default function LessonPage() {
 
     try {
       // Get current progress for this topic
-      const currentProgress = progressData?.progress?.find(p => 
+      const currentProgress = progressData?.progress?.find(p =>
         (p.topicId?._id === topicId || p.topicId === topicId)
       );
-      
+
       const currentCompletedCount = currentProgress?.completedLessons || 0;
       const newCompletedCount = Math.max(currentCompletedCount, lessonIndex + 1);
 
@@ -83,7 +89,7 @@ export default function LessonPage() {
         topicId: topic._id,
         completedLessons: newCompletedCount
       }).unwrap();
-      
+
       setCompleted(true);
       toast.success("Lesson marked as complete!");
     } catch (err) {
@@ -92,7 +98,7 @@ export default function LessonPage() {
     }
   };
 
-  const handleSpeak = (text) => {
+  const handleSpeak = (fallbackText) => {
     if (!speechSynthesis) {
       toast.error("Text-to-speech is not supported in your browser");
       return;
@@ -104,7 +110,13 @@ export default function LessonPage() {
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    let textToRead = fallbackText;
+    const contentBox = document.getElementById("readable-content");
+    if (contentBox && contentBox.innerText) {
+      textToRead = `Lesson: ${lesson.title}. \n ${contentBox.innerText}`;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToRead);
     utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 1;
@@ -121,17 +133,17 @@ export default function LessonPage() {
 
   const getLessonText = () => {
     let text = `Lesson: ${lesson.title}. `;
-    
+
     // Add description
     if (lesson.description) {
       text += lesson.description + ". ";
     }
-    
+
     // Add text content for text lessons
     if (lesson.type === "text" && lesson.textContent) {
       text += lesson.textContent + ". ";
     }
-    
+
     // Add type-specific information
     if (lesson.type === "text" && !lesson.textContent) {
       text += "This is a text-based lesson where you can read through the material at your own pace. ";
@@ -140,10 +152,10 @@ export default function LessonPage() {
     } else if (lesson.type === "animation") {
       text += "This is an interactive animation lesson. Explore the animation to understand the concepts. ";
     }
-    
+
     // Add duration
     text += `This lesson takes approximately ${lesson.durationMins} minutes to complete.`;
-    
+
     return text;
   };
 
@@ -156,12 +168,19 @@ export default function LessonPage() {
     }
   };
 
+  const handlePrev = () => {
+    if (hasPrevLesson) {
+      router.push(`/lessons/${topicId}-${prevLessonIndex}`);
+      setCompleted(false);
+    }
+  };
+
   return (
     <main className="main">
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <a 
+          <a
             href={`/topics/${topicId}`}
             style={{ fontSize: 13, color: "#64748b", textDecoration: "none" }}
           >
@@ -185,7 +204,7 @@ export default function LessonPage() {
               </span>
             </div>
           </div>
-          
+
           {/* Text-to-Speech Button */}
           <button
             onClick={() => handleSpeak(getLessonText())}
@@ -213,21 +232,21 @@ export default function LessonPage() {
           </span>
         </div>
         <div className="progress-bar" style={{ height: 6, background: "#e2e8f0" }}>
-          <span style={{ 
-            width: `${((lessonIndex + 1) / topic.lessons.length) * 100}%`, 
-            background: "#3498db" 
+          <span style={{
+            width: `${((lessonIndex + 1) / topic.lessons.length) * 100}%`,
+            background: "#3498db"
           }} />
         </div>
       </div>
 
       {/* Main Content */}
       <div className="lesson-container">
-        
+
         {/* Lesson Content Column */}
         <div>
-          <div className="lesson-card">
+          <div className="lesson-card" id="readable-content">
             {/* Lesson Description */}
-            <div style={{ 
+            <div style={{
               background: "#f8fafc",
               border: "1px solid #e2e8f0",
               borderRadius: 12,
@@ -241,11 +260,47 @@ export default function LessonPage() {
             </div>
 
             {/* Type-specific content */}
+            {lesson.type === "interactive" && lesson.customId && lesson.customId.startsWith("week1") && (
+              <div style={{ marginBottom: 24, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <Week1Interactions customId={lesson.customId} />
+              </div>
+            )}
+
+            {lesson.type === "interactive" && lesson.customId && lesson.customId.startsWith("week2") && (
+              <div style={{ marginBottom: 24, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <Week2Interactions customId={lesson.customId} />
+              </div>
+            )}
+
+            {lesson.type === "interactive" && lesson.customId && lesson.customId.startsWith("week3") && (
+              <div style={{ marginBottom: 24, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <Week3Interactions customId={lesson.customId} />
+              </div>
+            )}
+
+            {lesson.type === "interactive" && lesson.customId && lesson.customId.startsWith("week4") && (
+              <div style={{ marginBottom: 24, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <Week4Interactions customId={lesson.customId} />
+              </div>
+            )}
+
+            {lesson.type === "interactive" && lesson.customId && lesson.customId.startsWith("week5") && (
+              <div style={{ marginBottom: 24, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <Week5Interactions customId={lesson.customId} />
+              </div>
+            )}
+
+            {lesson.type === "interactive" && lesson.customId && lesson.customId.startsWith("week6") && (
+              <div style={{ marginBottom: 24, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", overflow: "hidden" }}>
+                <Week6Interactions customId={lesson.customId} />
+              </div>
+            )}
+
             {(lesson.type === "video" || lesson.type === "animation") && (
               <div style={{ marginBottom: 24 }}>
-                <div 
+                <div
                   className="placeholder-card"
-                  style={{ 
+                  style={{
                     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                     padding: lesson.contentUrl ? 0 : undefined,
                     overflow: "hidden"
@@ -253,14 +308,14 @@ export default function LessonPage() {
                 >
                   {lesson.contentUrl ? (
                     <div style={{ backgroundColor: "#000", display: "flex", justifyContent: "center" }}>
-                      <video 
-                        src={lesson.contentUrl} 
-                        controls 
-                        style={{ 
-                          maxWidth: "100%", 
+                      <video
+                        src={lesson.contentUrl}
+                        controls
+                        style={{
+                          maxWidth: "100%",
                           maxHeight: "600px",
                           display: "block"
-                        }} 
+                        }}
                       />
                     </div>
                   ) : (
@@ -283,15 +338,15 @@ export default function LessonPage() {
             {lesson.type === "text" && (
               <div style={{ marginBottom: 24 }}>
                 {lesson.textContent ? (
-                  <div style={{ 
+                  <div style={{
                     background: "#ffffff",
                     border: "1px solid #e2e8f0",
                     borderRadius: 12,
-                    padding: "24px" 
+                    padding: "24px"
                   }}>
                     <h3 style={{ fontSize: 20, marginBottom: 16, color: "#0f172a" }}>📖 Lesson Content</h3>
-                    <div style={{ 
-                      lineHeight: 1.8, 
+                    <div style={{
+                      lineHeight: 1.8,
                       color: "#334155",
                       whiteSpace: "pre-wrap",
                       fontSize: 15
@@ -300,7 +355,7 @@ export default function LessonPage() {
                     </div>
                   </div>
                 ) : (
-                  <div 
+                  <div
                     className="placeholder-card"
                     style={{ background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" }}
                   >
@@ -316,7 +371,7 @@ export default function LessonPage() {
 
             {lesson.type === "quiz" && (
               <div style={{ marginBottom: 24 }}>
-                <div 
+                <div
                   className="placeholder-card"
                   style={{ background: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" }}
                 >
@@ -329,35 +384,52 @@ export default function LessonPage() {
               </div>
             )}
 
-            <div style={{ 
-              background: "#fffbeb", 
+            <div style={{
+              background: "#fffbeb",
               border: "1px solid #fef3c7",
               borderRadius: 12,
               padding: 20
             }}>
               <h4 style={{ fontSize: 14, marginBottom: 8, color: "#92400e" }}>💡 Key Takeaways</h4>
               <p style={{ fontSize: 14, color: "#78350f", margin: 0 }}>
-                Make sure you understand the concepts before moving to the next lesson. 
+                Make sure you understand the concepts before moving to the next lesson.
                 You can always come back and review this material. Use the AI Tutor if you need help!
               </p>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: "flex", gap: 16, justifyContent: "space-between", flexWrap: "wrap" }}>
-            <button
-              onClick={handleMarkComplete}
-              disabled={completed}
-              className="button secondary"
-              style={{ 
-                background: completed ? "#dcfce7" : "#eef4ff",
-                color: completed ? "#166534" : "#216aa2",
-                cursor: completed ? "default" : "pointer"
-              }}
-            >
-              {completed ? "✓ Completed" : "Mark as Complete"}
-            </button>
-            
+          <div style={{ display: "flex", gap: 16, justifyContent: "space-between", flexWrap: "wrap", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <button
+                onClick={handlePrev}
+                disabled={!hasPrevLesson}
+                className="button secondary"
+                style={{
+                  opacity: hasPrevLesson ? 1 : 0.5,
+                  cursor: hasPrevLesson ? "pointer" : "not-allowed",
+                  background: "#f8fafc",
+                  color: "#334155",
+                  border: "1px solid #e2e8f0"
+                }}
+              >
+                &larr; Previous
+              </button>
+
+              <button
+                onClick={handleMarkComplete}
+                disabled={completed}
+                className="button secondary"
+                style={{
+                  background: completed ? "#dcfce7" : "#eef4ff",
+                  color: completed ? "#166534" : "#216aa2",
+                  cursor: completed ? "default" : "pointer"
+                }}
+              >
+                {completed ? "✓ Completed" : "Mark as Complete"}
+              </button>
+            </div>
+
             <button
               onClick={handleNext}
               className="button primary"
@@ -406,8 +478,8 @@ export default function LessonPage() {
                     {idx + 1}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ 
-                      fontSize: 13, 
+                    <div style={{
+                      fontSize: 13,
                       fontWeight: idx === lessonIndex ? 600 : 400,
                       whiteSpace: "nowrap",
                       overflow: "hidden",
@@ -427,7 +499,7 @@ export default function LessonPage() {
       </div>
 
       {/* AI Tutor Component */}
-      <AITutor 
+      <AITutor
         lessonTitle={lesson.title}
         lessonType={lesson.type}
         lessonContent={lesson.content || getLessonText()}

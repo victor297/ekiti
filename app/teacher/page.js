@@ -50,14 +50,14 @@ export default function TeacherDashboard() {
     );
   }
 
-  const topics = topicsData?.topics || [];
+  const topics = [...(topicsData?.topics || [])].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
   const students = studentsData?.students || [];
   const totalLessons = topics.reduce((sum, topic) => sum + topic.lessons.length, 0);
   const bestStudent = students.length
     ? students.reduce((best, current) => {
-        if (!best || current.avgScore > best.avgScore) return current;
-        return best;
-      }, null)
+      if (!best || current.avgScore > best.avgScore) return current;
+      return best;
+    }, null)
     : null;
   const totalStudents = students.length;
 
@@ -95,12 +95,12 @@ export default function TeacherDashboard() {
       </section>
 
       {/* Stats Row */}
-      <section 
-        style={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", 
-          gap: 24, 
-          marginBottom: 40 
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 24,
+          marginBottom: 40
         }}
       >
         <div className="card" style={{ borderLeft: "4px solid #3498db", padding: "24px" }}>
@@ -147,9 +147,9 @@ export default function TeacherDashboard() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
           {(progressData?.progress || []).map((item) => (
-            <div key={item._id} style={{ 
-              border: "1px solid #e2e8f0", 
-              borderRadius: 12, 
+            <div key={item._id} style={{
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
               padding: 20,
               background: "#f8fafc"
             }}>
@@ -159,32 +159,31 @@ export default function TeacherDashboard() {
                   {item.score}%
                 </span>
               </div>
-              
+
               <div style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", fontSize: 12, color: "#64748b" }}>
                 <span>Progress</span>
                 <span>{item.completedLessons}/{item.totalLessons} lessons</span>
               </div>
-              
+
               <div className="progress-bar" style={{ height: 6, background: "#e2e8f0" }}>
                 <span
                   style={{
-                    width: `${
-                      item.totalLessons
+                    width: `${item.totalLessons
                         ? (item.completedLessons / item.totalLessons) * 100
                         : 0
-                    }%`,
+                      }%`,
                     background: item.completedLessons === item.totalLessons ? "#2ecc71" : "#3498db"
                   }}
                 />
               </div>
             </div>
           ))}
-          
+
           {!progressData?.progress?.length && (
-             <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: 40, color: "#64748b" }}>
-               <p>No progress data found for this student.</p>
-               <p style={{ fontSize: 13, marginTop: 4 }}>Try entering a different email or ask students to complete quizzes.</p>
-             </div>
+            <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: 40, color: "#64748b" }}>
+              <p>No progress data found for this student.</p>
+              <p style={{ fontSize: 13, marginTop: 4 }}>Try entering a different email or ask students to complete quizzes.</p>
+            </div>
           )}
         </div>
       </section>

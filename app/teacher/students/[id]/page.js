@@ -58,6 +58,7 @@ export default function StudentDetailPage({ params }) {
         <div className="brand">
           <span>{data.student.name}</span>
           <span className="badge">Student</span>
+          <span className="badge" style={{ background: "#f8fafc", color: "#64748b", textTransform: "capitalize" }}>{data.student.gender}</span>
         </div>
         <div className="cta-row">
           <a className="button secondary" href="/teacher/students">

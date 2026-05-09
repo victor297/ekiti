@@ -64,6 +64,25 @@ export default function LessonPage() {
     );
   }
 
+  // Progress check
+  const currentProgress = progressData?.progress?.find(p =>
+    (p.topicId?._id === topicId || p.topicId === topicId)
+  );
+  const completedCount = currentProgress?.completedLessons || 0;
+  const isLocked = lessonIndex > completedCount;
+
+  if (isLocked) {
+    return (
+      <main className="main">
+        <h1 className="section-title">Lesson Locked</h1>
+        <p>You need to complete the previous lessons before you can access this one.</p>
+        <div className="cta-row">
+          <a href={`/topics/${topicId}`} className="button primary">Back to Topic</a>
+        </div>
+      </main>
+    );
+  }
+
   const nextLessonIndex = lessonIndex + 1;
   const hasNextLesson = nextLessonIndex < topic.lessons.length;
   const prevLessonIndex = lessonIndex - 1;
@@ -445,54 +464,62 @@ export default function LessonPage() {
           <div className="card" style={{ padding: 20 }}>
             <h3 style={{ fontSize: 16, marginBottom: 16 }}>Course Outline</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {topic.lessons.map((l, idx) => (
-                <a
-                  key={idx}
-                  href={`/lessons/${topicId}-${idx}`}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "10px 12px",
-                    borderRadius: 8,
-                    background: idx === lessonIndex ? "#e0f2fe" : "#f8fafc",
-                    border: `1px solid ${idx === lessonIndex ? "#0369a1" : "#e2e8f0"}`,
-                    textDecoration: "none",
-                    color: "inherit",
-                    transition: "all 0.2s"
-                  }}
-                >
-                  <div style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "50%",
-                    background: idx === lessonIndex ? "#0369a1" : "#cbd5e1",
-                    color: "white",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    flexShrink: 0
-                  }}>
-                    {idx + 1}
+              {topic.lessons.map((l, idx) => {
+                const isItemLocked = idx > completedCount;
+                
+                return (
+                  <div key={idx} style={{ position: "relative" }}>
+                    <a
+                      href={isItemLocked ? "#" : `/lessons/${topicId}-${idx}`}
+                      onClick={(e) => isItemLocked && e.preventDefault()}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        padding: "10px 12px",
+                        borderRadius: 8,
+                        background: idx === lessonIndex ? "#e0f2fe" : "#f8fafc",
+                        border: `1px solid ${idx === lessonIndex ? "#0369a1" : "#e2e8f0"}`,
+                        textDecoration: "none",
+                        color: isItemLocked ? "#94a3b8" : "inherit",
+                        transition: "all 0.2s",
+                        cursor: isItemLocked ? "not-allowed" : "pointer",
+                        opacity: isItemLocked ? 0.7 : 1
+                      }}
+                    >
+                      <div style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: "50%",
+                        background: idx === lessonIndex ? "#0369a1" : (isItemLocked ? "#e2e8f0" : "#cbd5e1"),
+                        color: "white",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        flexShrink: 0
+                      }}>
+                        {isItemLocked ? "🔒" : idx + 1}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          fontSize: 13,
+                          fontWeight: idx === lessonIndex ? 600 : 400,
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis"
+                        }}>
+                          {l.title}
+                        </div>
+                        <div style={{ fontSize: 11, color: "#64748b" }}>
+                          {isItemLocked ? "Locked" : `${l.durationMins} min`}
+                        </div>
+                      </div>
+                    </a>
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{
-                      fontSize: 13,
-                      fontWeight: idx === lessonIndex ? 600 : 400,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis"
-                    }}>
-                      {l.title}
-                    </div>
-                    <div style={{ fontSize: 11, color: "#64748b" }}>
-                      {l.durationMins} min
-                    </div>
-                  </div>
-                </a>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

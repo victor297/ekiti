@@ -140,6 +140,7 @@ export default function TeacherStudentsPage() {
                 <tr>
                   <th style={{ background: "#f1f5f9", color: "#475569", padding: "16px" }}>Name</th>
                   <th style={{ background: "#f1f5f9", color: "#475569", padding: "16px" }}>Email</th>
+                  <th style={{ background: "#f1f5f9", color: "#475569", padding: "16px" }}>Gender</th>
                   <th style={{ background: "#f1f5f9", color: "#475569", padding: "16px" }}>Avg Score</th>
                   <th style={{ background: "#f1f5f9", color: "#475569", padding: "16px" }}>Attempts</th>
                   <th style={{ background: "#f1f5f9", color: "#475569", padding: "16px" }}>Actions</th>
@@ -166,6 +167,7 @@ export default function TeacherStudentsPage() {
                       </div>
                     </td>
                     <td style={{ padding: "16px", color: "#64748b" }}>{student.email}</td>
+                    <td style={{ padding: "16px", color: "#64748b", textTransform: "capitalize" }}>{student.gender}</td>
                     <td style={{ padding: "16px" }}>
                       <span style={{ 
                         fontWeight: 700, 

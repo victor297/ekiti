@@ -7,9 +7,9 @@ import bcrypt from "bcryptjs";
 export async function POST(request) {
   await connectDB();
   const body = await request.json();
-  const { name, email, password, token } = body;
+  const { name, email, password, gender, token } = body;
 
-  if (!name || !email || !password || !token) {
+  if (!name || !email || !password || !gender || !token) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
@@ -33,6 +33,7 @@ export async function POST(request) {
     email,
     role: "student",
     password: hashed,
+    gender,
     isActive: true
   });
 

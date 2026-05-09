@@ -3,13 +3,15 @@ export const seedUsers = [
     name: "Mrs. Adebayo",
     email: "teacher@jss2math.local",
     role: "teacher",
-    password: "teacher123"
+    password: "teacher123",
+    gender: "female"
   },
   {
     name: "Chika",
     email: "student@jss2math.local",
     role: "student",
-    password: "student123"
+    password: "student123",
+    gender: "female"
   }
 ];
 

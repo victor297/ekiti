@@ -16,7 +16,7 @@ export async function GET() {
 
   await connectDB();
   const students = await User.find({ role: "student" })
-    .select("name email createdAt isActive")
+    .select("name email gender createdAt isActive")
     .sort({ createdAt: -1 })
     .lean();
 
@@ -53,6 +53,7 @@ export async function GET() {
       id: student._id,
       name: student.name,
       email: student.email,
+      gender: student.gender || "other",
       isActive: student.isActive !== false, // Use !== false to handle existing records
       createdAt: student.createdAt,
       attemptCount: attemptsByUser[student.email] || 0,

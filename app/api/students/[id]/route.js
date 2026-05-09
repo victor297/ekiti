@@ -33,6 +33,7 @@ export async function GET(request, { params }) {
       id: student._id,
       name: student.name,
       email: student.email,
+      gender: student.gender || "other",
       isActive: student.isActive !== false,
       createdAt: student.createdAt
     },
